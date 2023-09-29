@@ -8,6 +8,5 @@ numpy
 scipy
 matplotlib
 mechafil
-# mechafil-jax @ git+https://github.com/kkarrancsu/mechafil-jax.git
-mechafil-jax @ git+https://github.com/tmellan/mechafil-jax-equilibrium.git
+mechafil-jax @ git+https://github.com/kkarrancsu/mechafil-jax.git
 scenario-generator @ git+https://github.com/protocol/scenario-generator.git

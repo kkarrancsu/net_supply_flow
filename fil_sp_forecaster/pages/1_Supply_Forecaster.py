@@ -106,7 +106,7 @@ def plot_panel(scenario_results, baseline, start_date, current_date, end_date, s
         supplyflow = (
             alt.Chart(supplyflow_df)
             .mark_line()
-            .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
+            .encode(x=alt.X("date:T", title="", axis=alt.Axis(labelAngle=-45, format="%Y-%m")), 
                     y=alt.Y("M-FIL"), color=alt.Color('Scenario', legend=None))
             .properties(title="Net Supply Flow")
             .configure_title(fontSize=14, anchor='middle')
@@ -123,11 +123,9 @@ def plot_panel(scenario_results, baseline, start_date, current_date, end_date, s
         power = (
             alt.Chart(power_df)
             .mark_line()
-            .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
-                    y=alt.Y("EIB"), 
+            .encode(x=alt.X("date:T", title="", axis=alt.Axis(labelAngle=-45, format="%Y-%m")), 
+                    y=alt.Y("EIB", title='EiB'), 
                     color=alt.Color('Power', legend=alt.Legend(orient="top", title=None)))
-            # .encode(x=alt.X("date", title="", axis=alt.Axis(labelAngle=-45)), 
-            #         y=alt.Y("EIB"))
             .properties(title="Network Power")
             .configure_title(fontSize=14, anchor='middle')
         )
