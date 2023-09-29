@@ -80,6 +80,10 @@ def plot_panel(scenario_results, baseline, start_date, current_date, end_date, s
     supplyflow_dff['StatusQuo'] = status_quo_results['circ_supply']
     supplyflow_dff['StatusQuo'] = supplyflow_dff['StatusQuo'].diff().rolling(28).median().dropna() / 1_000_000
     supplyflow_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=supplyflow_dff.shape[0]))
+
+    lcs_dff = pd.DataFrame()
+    lcs_dff['StatusQuo'] = status_quo_results['network_locked'] /  status_quo_results['circ_supply'] * 100
+    lcs_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=supplyflow_dff.shape[0]))
     
     CostPCTofRewards = st.session_state['cost_pct_rewards']
     XRLockSensitivity = st.session_state['xr_locking_sensitivity']
@@ -100,6 +104,9 @@ def plot_panel(scenario_results, baseline, start_date, current_date, end_date, s
                                     value_vars=["StatusQuo"],
                                     var_name='Scenario', value_name='M-FIL')
     plot_df = plot_df.melt('TL', var_name='ROI', value_name='Value')
+    lcs_df = pd.melt(lcs_dff, id_vars=["date"],
+                                    value_vars=["StatusQuo"],
+                                    var_name='Scenario', value_name='%')
 
     col1, col2 = st.columns(2)
     with col1:
@@ -142,6 +149,16 @@ def plot_panel(scenario_results, baseline, start_date, current_date, end_date, s
             .configure_title(fontSize=14, anchor='middle')
         )
         st.altair_chart(chart.interactive(), use_container_width=True)
+
+        lcs_chart = (
+            alt.Chart(lcs_df)
+            .mark_line()
+            .encode(x=alt.X("date:T", title="", axis=alt.Axis(labelAngle=-45, format="%Y-%m")), 
+                    y=alt.Y("%"), color=alt.Color('Scenario', legend=None))
+            .properties(title="Locked/Circulating Supply (%)")
+            .configure_title(fontSize=14, anchor='middle')
+        )
+        st.altair_chart(lcs_chart.interactive(), use_container_width=True)
 
 
 def run_sim(rbp, rr, fpr, lock_target, start_date, current_date, forecast_length_days, sector_duration_days, burn_boost, offline_data):
