@@ -77,13 +77,13 @@ def plot_panel(scenario_results, baseline, start_date, current_date, end_date, s
     pledge_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=pledge_dff.shape[0]))
 
     supplyflow_dff = pd.DataFrame()
-    supplyflow_dff['StatusQuo'] = status_quo_results['circ_supply']
-    supplyflow_dff['StatusQuo'] = supplyflow_dff['StatusQuo'].diff().rolling(28).median().dropna() / 1_000_000
+    cs = pd.Series(np.asarray(status_quo_results['circ_supply']).copy())
+    supplyflow_dff['StatusQuo'] = cs.diff().rolling(7).median() / 1_000_000
     supplyflow_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=supplyflow_dff.shape[0]))
 
     lcs_dff = pd.DataFrame()
     lcs_dff['StatusQuo'] = status_quo_results['network_locked'] /  status_quo_results['circ_supply'] * 100
-    lcs_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=supplyflow_dff.shape[0]))
+    lcs_dff['date'] = pd.to_datetime(du.get_t(start_date, forecast_length=len(cs)))
     
     CostPCTofRewards = st.session_state['cost_pct_rewards']
     XRLockSensitivity = st.session_state['xr_locking_sensitivity']
@@ -254,7 +254,7 @@ def main():
         with st.expander('Macro Configuration'):
             st.slider("Raw Byte Onboarding (PiB/day)", min_value=3., max_value=50., value=smoothed_last_historical_rbp, step=.1, format='%0.02f', key="rbp_slider",
                     on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
-            st.slider("Renewal Rate (Percentage)", min_value=10, max_value=99, value=95, step=1, format='%d', key="rr_slider",
+            st.slider("Renewal Rate (Percentage)", min_value=10, max_value=99, value=smoothed_last_historical_renewal_pct, step=1, format='%d', key="rr_slider",
                     on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
             st.slider("FIL+ Rate (Percentage)", min_value=10, max_value=99, value=smoothed_last_historical_fil_plus_pct, step=1, format='%d', key="fpr_slider",
                     on_change=forecast_economy, kwargs=forecast_kwargs, disabled=False, label_visibility="visible")
